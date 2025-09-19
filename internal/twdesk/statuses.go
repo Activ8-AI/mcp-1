@@ -35,6 +35,7 @@ func StatusGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodStatusGet),
 			mcp.WithDescription("Get a status from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the status to retrieve."),
@@ -55,6 +56,7 @@ func StatusGet(client *deskclient.Client) server.ServerTool {
 func StatusList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all statuses in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithArray("name", mcp.Description("The name of the status to filter by.")),
 		mcp.WithArray("color", mcp.Description("The color of the status to filter by.")),
 		mcp.WithArray("code", mcp.Description("The code of the status to filter by.")),

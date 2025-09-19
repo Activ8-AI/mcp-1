@@ -35,6 +35,7 @@ func PriorityGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodPriorityGet),
 			mcp.WithDescription("Get a priority from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the priority to retrieve."),
@@ -55,6 +56,7 @@ func PriorityGet(client *deskclient.Client) server.ServerTool {
 func PriorityList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all priorities in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithArray("name", mcp.Description("The name of the priority to filter by.")),
 		mcp.WithArray("color", mcp.Description("The color of the priority to filter by.")),
 	}

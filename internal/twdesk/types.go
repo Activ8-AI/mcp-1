@@ -35,6 +35,7 @@ func TypeGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodTypeGet),
 			mcp.WithDescription("Get a type from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the type to retrieve."),
@@ -55,6 +56,7 @@ func TypeGet(client *deskclient.Client) server.ServerTool {
 func TypeList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all types in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithArray("name", mcp.Description("The name of the type to filter by.")),
 		mcp.WithArray("inboxIDs", mcp.Description("The inbox IDs of the type to filter by.")),
 	}

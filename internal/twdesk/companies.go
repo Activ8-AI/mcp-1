@@ -35,6 +35,7 @@ func CompanyGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodCompanyGet),
 			mcp.WithDescription("Get a company from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the company to retrieve."),
@@ -55,6 +56,7 @@ func CompanyGet(client *deskclient.Client) server.ServerTool {
 func CompanyList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all companies in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithString("name", mcp.Description("The name of the company to filter by.")),
 		mcp.WithArray("domains", mcp.Description("The domains of the company to filter by.")),
 		mcp.WithString("kind", mcp.Description("The kind of the company to filter by."), mcp.Enum("company", "group")),

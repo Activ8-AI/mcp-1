@@ -37,6 +37,7 @@ func TicketGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodTicketGet),
 			mcp.WithDescription("Get a ticket from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the ticket to retrieve."),
@@ -64,6 +65,7 @@ func TicketGet(client *deskclient.Client) server.ServerTool {
 func TicketList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all tickets in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithArray("inboxIDs", mcp.Description("The IDs of the inboxes to filter by.")),
 		mcp.WithArray("customerIDs", mcp.Description("The IDs of the customers to filter by.")),
 		mcp.WithArray("companyIDs", mcp.Description("The IDs of the companies to filter by.")),

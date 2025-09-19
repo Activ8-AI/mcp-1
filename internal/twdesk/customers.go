@@ -35,6 +35,7 @@ func CustomerGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodCustomerGet),
 			mcp.WithDescription("Get a customer from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the customer to retrieve."),
@@ -55,6 +56,7 @@ func CustomerGet(client *deskclient.Client) server.ServerTool {
 func CustomerList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all customers in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithArray("companyIDs", mcp.Description("The IDs of the companies to filter by.")),
 		mcp.WithArray("companyNames", mcp.Description("The names of the companies to filter by.")),
 		mcp.WithArray("emails", mcp.Description("The emails of the customers to filter by.")),

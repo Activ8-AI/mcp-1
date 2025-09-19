@@ -35,6 +35,7 @@ func TagGet(client *deskclient.Client) server.ServerTool {
 	return server.ServerTool{
 		Tool: mcp.NewTool(string(MethodTagGet),
 			mcp.WithDescription("Get a tag from Teamwork Desk"),
+			mcp.WithReadOnlyHintAnnotation(true),
 			mcp.WithString("id",
 				mcp.Required(),
 				mcp.Description("The ID of the tag to retrieve."),
@@ -55,6 +56,7 @@ func TagGet(client *deskclient.Client) server.ServerTool {
 func TagList(client *deskclient.Client) server.ServerTool {
 	opts := []mcp.ToolOption{
 		mcp.WithDescription("List all tags in Teamwork Desk"),
+		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithString("name", mcp.Description("The name of the tag to filter by.")),
 		mcp.WithString("color", mcp.Description("The color of the tag to filter by.")),
 		mcp.WithArray("inboxIDs", mcp.Description("The IDs of the inboxes to filter by.")),
