@@ -38,6 +38,9 @@ func MessageCreate(client *deskclient.Client) server.ServerTool {
 			),
 		),
 		Handler: func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			_ = client // TODO: use the client to create the message
+			_ = ctx
+			_ = request
 			return nil, errors.New("not implemented")
 		},
 	}
