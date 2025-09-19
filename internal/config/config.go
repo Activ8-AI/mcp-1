@@ -20,6 +20,7 @@ import (
 	"github.com/mark3labs/mcp-go/client/transport"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	desksdk "github.com/teamwork/desksdkgo/client"
 	"github.com/teamwork/mcp/internal/request"
 	"github.com/teamwork/mcp/internal/toolsets"
 	twapi "github.com/teamwork/twapi-go-sdk"
@@ -114,6 +115,11 @@ func Load(logOutput io.Writer) (Resources, func()) {
 			})
 		}),
 		twapi.WithLogger(resources.logger),
+	)
+
+	resources.deskClient = desksdk.NewClient(
+		resources.Info.APIURL,
+		desksdk.WithAPIKey(resources.Info.BearerToken),
 	)
 
 	if resources.Info.DatadogAPM.Enabled {
