@@ -1,6 +1,14 @@
 package twdesk
 
-import "github.com/teamwork/mcp/internal/toolsets"
+import (
+	"context"
+	"errors"
+
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
+	deskclient "github.com/teamwork/desksdkgo/client"
+	"github.com/teamwork/mcp/internal/toolsets"
+)
 
 // List of methods available in the Teamwork.com MCP service.
 //
@@ -8,14 +16,29 @@ import "github.com/teamwork/mcp/internal/toolsets"
 // https://github.com/github/github-mcp-server/issues/333
 const (
 	MethodMessageCreate toolsets.Method = "twdesk-create_message"
-	MethodMessageUpdate toolsets.Method = "twdesk-update_message"
-	MethodMessageGet    toolsets.Method = "twdesk-get_message"
-	MethodMessageList   toolsets.Method = "twdesk-list_messages"
 )
 
 func init() {
 	toolsets.RegisterMethod(MethodMessageCreate)
-	toolsets.RegisterMethod(MethodMessageUpdate)
-	toolsets.RegisterMethod(MethodMessageGet)
-	toolsets.RegisterMethod(MethodMessageList)
+}
+
+// MessageCreate replies to a ticket in Teamwork Desk.  TODO: Still need to
+// define the client for this.
+func MessageCreate(client *deskclient.Client) server.ServerTool {
+	return server.ServerTool{
+		Tool: mcp.NewTool(string(MethodMessageCreate),
+			mcp.WithDescription("Craft a reply to a ticket in Teamwork Desk"),
+			mcp.WithNumber("ticketID",
+				mcp.Required(),
+				mcp.Description("The ID of the ticket that the message will be sent to."),
+			),
+			mcp.WithString("body",
+				mcp.Required(),
+				mcp.Description("The body of the message."),
+			),
+		),
+		Handler: func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			return nil, errors.New("not implemented")
+		},
+	}
 }

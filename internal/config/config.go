@@ -136,13 +136,27 @@ func Load(logOutput io.Writer) (Resources, func()) {
 
 // NewMCPServer creates a new MCP server with the given resources and toolset
 // group.
-func NewMCPServer(resources Resources, group *toolsets.ToolsetGroup) *server.MCPServer {
+func NewMCPServer(resources Resources, groups ...*toolsets.ToolsetGroup) *server.MCPServer {
+	// Determine if any group has tools
+	hasTools := false
+	for _, group := range groups {
+		if group.HasTools() {
+			hasTools = true
+			break
+		}
+	}
+
 	mcpServer := server.NewMCPServer(mcpName, strings.TrimPrefix(resources.Info.Version, "v"),
 		server.WithRecovery(),
-		server.WithToolCapabilities(group.HasTools()),
+		server.WithToolCapabilities(hasTools),
 		server.WithLogging(),
 	)
-	group.RegisterAll(mcpServer)
+
+	// Register all toolset groups
+	for _, group := range groups {
+		group.RegisterAll(mcpServer)
+	}
+
 	return mcpServer
 }
 
