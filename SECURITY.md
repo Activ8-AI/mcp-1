@@ -124,6 +124,36 @@ as needed.
 
 ## Security Features
 
+This MCP server implements several security features to protect your data and integrations:
+
+### Authentication & Authorization
+
+- **Bearer Token Authentication**: Secure API key-based authentication
+- **OAuth2 Support**: Industry-standard OAuth2 flow for user authentication
+- **Scope-based Access Control**: Granular permission controls based on API capabilities
+- **Token Validation**: Automatic validation of authentication tokens
+
+### Network Security
+
+- **HTTPS Enforcement**: All API communications use HTTPS by default
+- **Rate Limiting Compliance**: Respects Teamwork API rate limits to prevent abuse
+- **Request Timeout**: Configurable timeouts to prevent resource exhaustion
+- **Connection Security**: Uses secure HTTP client configurations
+
+### Data Protection
+
+- **Input Validation**: Comprehensive validation of all input parameters
+- **Output Sanitization**: Safe handling and formatting of API responses
+- **Error Message Sanitization**: Prevents sensitive data exposure in error messages
+- **Minimal Data Exposure**: Only exposes necessary data through MCP tools
+
+### Application Security
+
+- **Dependency Management**: Minimal dependency footprint with regular security updates
+- **Memory Safety**: Built with Go's memory-safe language features
+- **Structured Logging**: Secure logging without sensitive data exposure
+- **Graceful Error Handling**: Proper error handling without information disclosure
+
 ## Vulnerability Disclosure Policy
 
 Once a security vulnerability is resolved:

@@ -5,6 +5,10 @@
 
 [![Go](https://img.shields.io/badge/Go-1.25.1-blue.svg)](https://golang.org/)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-green.svg)](https://modelcontextprotocol.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/teamwork/mcp)](https://goreportcard.com/report/github.com/teamwork/mcp)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/teamwork/mcp)](https://github.com/teamwork/mcp/releases/latest)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/teamwork/mcp/test.yaml?branch=main)](https://github.com/teamwork/mcp/actions/workflows/test.yaml)
 
 > 📌 Are you a Teamwork.com user wanting to connect AI tools (Claude Desktop, VS
 > Code Copilot Chat, Gemini, etc.) to your Teamwork.com site right now? Jump
@@ -121,3 +125,23 @@ NODE_EXTRA_CA_CERTS=letsencrypt-stg-root-x1.pem npx @modelcontextprotocol/inspec
 ├── CONTRIBUTING.md        # Contribution guide
 └── SECURITY.md            # Security policy
 ```
+
+## 🤝 Community & Contributing
+
+We welcome contributions of all kinds! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+
+### 📋 Code of Conduct
+This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you're expected to uphold this code.
+
+### 🆘 Getting Help
+- 💬 [GitHub Discussions](https://github.com/teamwork/mcp/discussions) - Ask questions and share ideas
+- 🐛 [GitHub Issues](https://github.com/teamwork/mcp/issues) - Report bugs and request features
+- 📖 [Support Guide](SUPPORT.md) - Comprehensive help and support information
+- 📚 [Documentation](https://apidocs.teamwork.com/) - Official API documentation
+
+### 🔒 Security
+Please report security vulnerabilities responsibly by following our [Security Policy](SECURITY.md).
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
