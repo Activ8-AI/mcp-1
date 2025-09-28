@@ -1,0 +1,99 @@
+name: Security
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+
+env:
+  GO_VERSION: "1.25.x"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    name: Go Vulnerability Check
+    
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Download modules
+        run: go mod download
+
+      - name: Run govulncheck
+        run: govulncheck ./...
+
+  nancy:
+    runs-on: ubuntu-latest
+    name: Nancy Vulnerability Scanner
+    
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Nancy vulnerability scanner
+        uses: sonatypecommunity/nancy-github-action@main
+        with:
+          nancyVersion: "v1.0.46"
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build
+        run: |
+          go build ./cmd/mcp-http
+          go build ./cmd/mcp-stdio
+          go build ./cmd/mcp-http-cli
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"

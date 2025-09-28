@@ -1,12 +1,35 @@
 version: 2
 updates:
+  # Go modules
   - package-ecosystem: "gomod"
     directory: "/"
-    registries: "*"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "@Teamwork/platformcore"
+    labels:
+      - "dependencies"
+      - "go"
+    commit-message:
+      prefix: "build(deps):"
+      include: "scope"
+
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
-    registries: "*"
     schedule:
       interval: "weekly"
+      day: "monday" 
+      time: "04:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "@Teamwork/platformcore"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci:"
+      include: "scope"

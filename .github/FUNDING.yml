@@ -1,0 +1,10 @@
+# These are supported funding model platforms
+
+# GitHub Sponsors
+github: # [teamwork] # Uncomment if Teamwork has GitHub Sponsors
+
+# Open Collective
+# open_collective: teamwork-mcp
+
+# Custom funding links
+custom: ['https://www.teamwork.com/pricing', 'https://www.teamwork.com/contact-sales']
