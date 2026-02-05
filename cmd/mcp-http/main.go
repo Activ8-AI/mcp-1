@@ -100,13 +100,15 @@ func newMCPServer(resources config.Resources) (*server.MCPServer, error) {
 
 func newRouter(resources config.Resources) *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+	healthHandler := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodOptions {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)
-	})
+	}
+	mux.HandleFunc("/api/health", healthHandler)
+	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/.well-known/oauth-protected-resource", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodOptions {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
@@ -164,7 +166,7 @@ func tracerMiddleware(resources config.Resources, next http.Handler) http.Handle
 			return fmt.Sprintf("%s_%s", req.Method, req.URL.Path)
 		}),
 		ddhttp.WithIgnoreRequest(func(req *http.Request) bool {
-			if req.URL.Path == "/api/health" {
+			if req.URL.Path == "/api/health" || req.URL.Path == "/health" {
 				return true
 			}
 			if strings.HasPrefix(req.URL.Path, "/.well-known") {
@@ -176,9 +178,51 @@ func tracerMiddleware(resources config.Resources, next http.Handler) http.Handle
 }
 
 func authMiddleware(resources config.Resources, next http.Handler) http.Handler {
+	// When basic auth mode is configured with an API token, the session is
+	// already baked into the engine. Skip per-request bearer validation and
+	// just inject the customer URL into context.
+	if resources.Info.AuthMode == "basic" && resources.Info.APIToken != "" {
+		return basicAuthMiddleware(resources, next)
+	}
+	return bearerAuthMiddleware(resources, next)
+}
+
+func basicAuthMiddleware(resources config.Resources, next http.Handler) http.Handler {
+	whitelistEndpoints := map[string][]string{
+		"/api/health": {http.MethodGet, http.MethodOptions},
+		"/health":     {http.MethodGet, http.MethodOptions},
+	}
+	whitelistPrefixEndpoints := map[string][]string{
+		"/.well-known": {"GET", "OPTIONS"},
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow whitelisted endpoints through without any auth
+		if methods, ok := whitelistEndpoints[r.URL.Path]; ok && slices.Contains(methods, r.Method) {
+			next.ServeHTTP(w, r)
+			return
+		}
+		for prefix, methods := range whitelistPrefixEndpoints {
+			if strings.HasPrefix(r.URL.Path, prefix) && slices.Contains(methods, r.Method) {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+
+		// In basic auth mode, inject the customer URL from config and proceed.
+		// The engine session already has the credentials baked in.
+		ctx := r.Context()
+		ctx = config.WithCrossRegion(ctx, false)
+		ctx = config.WithCustomerURL(ctx, resources.Info.CustomerURL)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func bearerAuthMiddleware(resources config.Resources, next http.Handler) http.Handler {
 	whitelistEndpoints := map[string][]string{
 		// health checks don't require authentication
 		"/api/health": {http.MethodGet, http.MethodOptions},
+		"/health":     {http.MethodGet, http.MethodOptions},
 	}
 
 	whitelistPrefixEndpoints := map[string][]string{

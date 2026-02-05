@@ -79,7 +79,26 @@ func Load(logOutput io.Writer) (Resources, func()) {
 		)
 	}
 
-	resources.teamworkEngine = twapi.NewEngine(session.NewBearerTokenContext(),
+	// Select session type based on auth mode.
+	var engineSession twapi.Session
+	switch resources.Info.AuthMode {
+	case "basic":
+		if resources.Info.APIToken != "" {
+			// API token mode: token as username, "x" as password
+			engineSession = session.NewBasicAuth(resources.Info.APIToken, "x", resources.Info.CustomerURL)
+			resources.logger.Info("using basic auth with API token",
+				slog.String("customer_url", resources.Info.CustomerURL),
+			)
+		} else {
+			// Fallback: context-based bearer (will require per-request injection)
+			engineSession = session.NewBearerTokenContext()
+			resources.logger.Warn("auth mode is basic but no API token configured, falling back to bearer context")
+		}
+	default:
+		engineSession = session.NewBearerTokenContext()
+	}
+
+	resources.teamworkEngine = twapi.NewEngine(engineSession,
 		twapi.WithHTTPClient(resources.teamworkHTTPClient),
 		twapi.WithMiddleware(func(next twapi.HTTPClient) twapi.HTTPClient {
 			return twapi.HTTPClientFunc(func(req *http.Request) (*http.Response, error) {

@@ -38,18 +38,39 @@ func main() {
 	ctx := context.Background()
 
 	var authenticated bool
-	if resources.Info.BearerToken != "" {
-		// detect the installation from the bearer token
-		if info, err := auth.GetBearerInfo(ctx, resources, resources.Info.BearerToken); err != nil {
-			resources.Logger().Error("failed to get bearer info",
-				slog.String("error", err.Error()),
-			)
-		} else {
-			authenticated = true
-			// inject customer URL in the context
-			ctx = config.WithCustomerURL(ctx, info.URL)
-			// inject bearer token in the context
-			ctx = session.WithBearerTokenContext(ctx, session.NewBearerToken(resources.Info.BearerToken, info.URL))
+	switch resources.Info.AuthMode {
+	case "basic":
+		if resources.Info.APIToken != "" {
+			// Basic auth mode with API token — validate credentials and inject
+			// customer URL. The engine session already has BasicAuth baked in.
+			info, err := auth.GetBasicInfo(ctx, resources, resources.Info.APIToken, "x", resources.Info.CustomerURL)
+			if err != nil {
+				resources.Logger().Error("failed to validate basic auth",
+					slog.String("error", err.Error()),
+				)
+			} else {
+				authenticated = true
+				ctx = config.WithCustomerURL(ctx, info.URL)
+				resources.Logger().Info("authenticated via basic auth",
+					slog.Int64("user_id", info.UserID),
+					slog.Int64("installation_id", info.InstallationID),
+				)
+			}
+		}
+	default:
+		if resources.Info.BearerToken != "" {
+			// detect the installation from the bearer token
+			if info, err := auth.GetBearerInfo(ctx, resources, resources.Info.BearerToken); err != nil {
+				resources.Logger().Error("failed to get bearer info",
+					slog.String("error", err.Error()),
+				)
+			} else {
+				authenticated = true
+				// inject customer URL in the context
+				ctx = config.WithCustomerURL(ctx, info.URL)
+				// inject bearer token in the context
+				ctx = session.WithBearerTokenContext(ctx, session.NewBearerToken(resources.Info.BearerToken, info.URL))
+			}
 		}
 	}
 
