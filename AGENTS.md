@@ -1,91 +1,57 @@
-# AGENTS.md
+<!-- managed-by: activ8-ai-context-pack | pack-version: 1.2.0 -->
+<!-- source-sha: 49e7fd4 -->
+<!-- platform: codex-cli | tier: T1 | version: 1.2.0 | policy: ai-agent-policy@wrapper | updated: 2026-03-18 -->
 
-A concise guide for AI coding agents working on this repository. It complements `README.md` with machine-actionable build, test, run, and convention notes.
+# AGENTS.md — mcp-1
 
-## Project overview
-- Language/runtime: Go 1.25 or newer
-- Purpose: Model Context Protocol (MCP) server for Teamwork.com with HTTP, STDIO transports and HTTP CLI.
-- Main entry points:
-  - STDIO server: `cmd/mcp-stdio/main.go`
-  - HTTP server: `cmd/mcp-http/main.go`
-  - HTTP CLI (tester): `cmd/mcp-http-cli/main.go`
-- Core domain/tooling: `internal/twprojects` (tools for projects, tasks, users, tags, comments, milestones, timers, timelogs, etc.)
+**Charter binding:** Activ8 AI Operational Execution & Accountability Charter (v1.5).
 
-## Setup commands
-- Install Go toolchain: Go 1.25 or newer (module declares `go 1.25.1`).
-- Sync deps: `go mod download`
-- Lint/format (optional but recommended):
-  - Format: `gofmt -s -w .`
-  - Vet: `go vet ./...`
-  - Install `golangci-lint` and run `golangci-lint -c .golangci.yml run ./...` for more checks.
+## Source of truth
 
-## Build and run
-- STDIO server (local, safest for editor/desktop agents):
-  - Env: `TW_MCP_BEARER_TOKEN=<token>`
-  - Run: `go run cmd/mcp-stdio/main.go`
-  - Flags: `-read-only` to restrict writes, `-toolsets=<comma-separated>` to limit exposed tools.
-- HTTP server (for hosted/cloud or tools that only speak HTTP):
-  - Env (examples): `TW_MCP_SERVER_ADDRESS=:8080`, optional `TW_MCP_LOG_LEVEL=debug`
-  - Run: `go run cmd/mcp-http/main.go`
-  - Health: GET `/health`
-- HTTP CLI (for quick tests against HTTP server):
-  - List tools: `go run cmd/mcp-http-cli/main.go -mcp-url=<url> -mcp-token=<token> list-tools`
-  - Call tool: `go run cmd/mcp-http-cli/main.go -mcp-url=<url> -mcp-token=<token> call-tool <toolName> '{"k":"v"}'`
-- Docker (optional, for image builds):
-  - Requires Docker Buildx. Local load: `make build` or `make build-stdio`
-  - Multi-arch push (maintainers): `make push` or `make push-stdio`
+- Local routing map: `docs/SOURCES-OF-TRUTH.md`
+- Local audience + surface contract: `docs/AUDIENCE-SURFACE-CONTRACT.md`
+- Central canonical policy: `https://github.com/Activ8-AI/activ8-ai-unified-mcp-server` at `.github/ai-agent-policy.md`
 
-## Testing instructions
-- Run all tests: `go test ./...`
-- Focus a package: `go test ./internal/twprojects`
-- Run a single test: `go test ./internal/twprojects -run TestName`
-- Notes:
-  - Tests in `internal/twprojects` mock the Teamwork API via an in-memory `twapi.Engine` stub (`mcpServerMock` in `internal/twprojects/main_test.go`). No external services are required.
-  - Keep tests fast and hermetic. Add/update tests alongside any tool changes.
+## Output contract
 
-## Configuration and env vars
-Common variables (subset; see command READMEs for complete lists):
-- Auth: `TW_MCP_BEARER_TOKEN` (Teamwork API bearer token; required for both transports)
-- API base: `TW_MCP_API_URL` (defaults to `https://teamwork.com`; set to your site domain like `https://<site>.teamwork.com` when needed)
-- HTTP server: `TW_MCP_SERVER_ADDRESS` (bind address, default `:8080`), `TW_MCP_URL`, `TW_MCP_ENV`, logging and Datadog vars
-- Logging: `TW_MCP_LOG_FORMAT` (`text`|`json`), `TW_MCP_LOG_LEVEL` (`info`|`debug`|...)
-- Inspector note: when using OAuth with Let’s Encrypt staging, set `NODE_EXTRA_CA_CERTS=letsencrypt-stg-root-x1.pem` for the MCP Inspector.
+`Progress | Evidence | Blockers`
 
-## Code layout and conventions
-- Tool surface lives in `internal/twprojects/*.go`. Files are organized by resource (e.g., `tasks.go`, `projects.go`) with matching `*_test.go`.
-- Tools are registered in `internal/twprojects/tools.go` via `DefaultToolsetGroup(readOnly, allowDelete, engine)`.
-  - Read-only enforcement is centralized; writes go in `AddWriteTools(...)`, reads in `AddReadTools(...)`.
-  - Destructive operations (delete) are guarded by the `allowDelete` flag; keep this pattern intact.
-- Prefer clear, explicit parameter schemas for tools and consistent naming:
-  - Tool names use the `twprojects-<action>` convention as exposed to MCP clients (see the existing tools for examples).
-- Follow standard Go style: keep functions small, pass `context.Context`, check and wrap errors, and ensure deterministic tests.
+## Obvious-Answer Question Elimination Rule
 
-## Adding or modifying tools (quick checklist)
-- Implement the tool function in the appropriate file under `internal/twprojects/` and return a `server.ServerTool` (see existing patterns, e.g., create/update/get/list functions in each file).
-- Register it in `DefaultToolsetGroup(...)`:
-  - Read-only tools → `AddReadTools(...)`
-  - Write tools → `AddWriteTools(...)` (and behind `allowDelete` for deletes)
-- Add tests in the matching `*_test.go` file using `mcpServerMock(...)` and `toolRequest` helpers found in `internal/twprojects/main_test.go`.
-- Run `go test ./internal/twprojects` until green.
+- Do not ask for confirmation when the requested action is already clear.
+- Execute the next obvious step and present the result.
 
-## Security considerations for agents
-- Never print or commit bearer tokens. Use env vars only. Redact tokens in logs.
-- Prefer running the STDIO server with `-read-only` by default during development.
-- For HTTP deployments, ensure TLS, least-privilege tokens, and sensible log levels.
-- Be careful with delete operations; keep them gated behind `allowDelete`.
+## Seek-First Planning Gate
 
-## PR/commit guidance
-- Before commit: `gofmt -s -w .` (or run your editor’s Go format), `go vet ./...`, `go test ./...`.
-- Include or update tests for any tool behavior changes.
-- Keep `README.md` end-user focused; put agent-oriented details here.
+- No action begins without a plan.
+- Verify in order: Notion first, then repo, then local/runtime files.
+- Search for existing artifacts before touching or proposing anything new.
+- Build on lineage before create-new.
 
-## Useful references (in-repo)
-- `README.md` — overview and quick-starts (HTTP, STDIO, CLI)
-- `usage.md` — end-user connection guide for popular MCP clients
-- `cmd/mcp-stdio/README.md` — STDIO server flags and envs
-- `cmd/mcp-http/README.md` — HTTP server envs and endpoints
-- `cmd/mcp-http-cli/README.md` — CLI usage
-- `internal/twprojects/tools.go` — tool registration hub
+## Seek First to Understand + Verify What Exists
 
----
-Treat this file as living documentation. Update it alongside changes to commands, flags, and conventions so agents can reliably build, test, and ship edits.
+- **Seek First to Understand:** before answering, deciding, or acting, gather context and ensure full comprehension.
+- **Verify what exists in Notion:** never assume. Check Notion first. Confirm presence, accuracy, and status of relevant information before proceeding.
+- **Search for existing artifacts:** look for relevant databases, pages, prior work, and connected surfaces before touching, modifying, or proposing anything new.
+- **Build on established work:** extend, refine, or elevate what exists. Respect artifact lineage.
+- **Create new only when necessary:** new artifacts or structures only when no suitable reference, structure, or precedent exists.
+- **Fail closed on deviation:** if verification is missing, the user correction changes the path, or drift is detected, stop, surface the mismatch, and restart from verified state.
+
+## Managed Repo Operationalization
+
+- Run `npm run operationalize:repo -- --dry-run` in preflight paths.
+- Keep `.github/workflows/build-operationalization.yml` present and green.
+- Keep prompt assets in `artifacts/prompt-library/` aligned to the central control plane.
+
+## Automatic Source Bootstrap
+
+- Run `npm run session:boot` at session start when the brief is missing or stale.
+- Reuse `memory/session-brief.md` and the receipts under `artifacts/source-query-ladder/` before broadening into fresh live workspace search.
+- Treat missing `scripts/session-boot.mjs` or `scripts/query-source-ladder.mjs` as a contract failure, not a convenience gap.
+
+## Trace + Audience Contract
+
+- Treat prior lineage as the default, not the exception.
+- Before classifying work as net-new, search for earlier mention, precursor language, adjacent framing, and codification.
+- Use `docs/AUDIENCE-SURFACE-CONTRACT.md` to classify the surface you are touching and bind:
+  `Audience`, `Surface Type`, `Canonical Source`, `Genesis`, and `Trace Origin`.
