@@ -23,7 +23,11 @@ type BasicInfo struct {
 // GetBasicInfo retrieves information about the basic auth credentials from
 // Teamwork API. It validates the credentials by calling /me.json with basic
 // auth. If the credentials are invalid, it returns ErrBasicInfoUnauthorized.
-func GetBasicInfo(ctx context.Context, resources config.Resources, username, password, serverURL string) (*BasicInfo, error) {
+func GetBasicInfo(
+	ctx context.Context,
+	resources config.Resources,
+	username, password, serverURL string,
+) (*BasicInfo, error) {
 	url := strings.TrimSuffix(serverURL, "/") + "/me.json"
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
