@@ -42,6 +42,16 @@ type Resources struct {
 		// BearerToken is the bearer token to be used to authenticate with Teamwork
 		// API. This is useful for the MCP server in STDIO mode.
 		BearerToken string
+		// AuthMode controls which authentication method to use. Supported values:
+		// "bearer" (default) or "basic". When set to "basic", the server uses
+		// HTTP basic auth with APIToken or username/password credentials.
+		AuthMode string
+		// APIToken is a Teamwork v1 API token (twp_*) for basic auth. When set,
+		// the server authenticates using this token as username with "x" as password.
+		APIToken string
+		// CustomerURL is the Teamwork instance URL (e.g., https://company.teamwork.com).
+		// Required when AuthMode is "basic".
+		CustomerURL string
 		// Log contains the logging configuration.
 		Log struct {
 			// Format is the format of the logs. It can be "json" or "text".
@@ -83,6 +93,9 @@ func newResources() Resources {
 	resources.Info.APIURL = strings.TrimSuffix(getEnv("TW_MCP_API_URL", "https://teamwork.com"), "/")
 	resources.Info.HAProxyURL = getEnv("TW_MCP_HAPROXY_URL", "")
 	resources.Info.BearerToken = getEnv("TW_MCP_BEARER_TOKEN", "")
+	resources.Info.AuthMode = strings.ToLower(getEnv("TW_MCP_AUTH_MODE", "bearer"))
+	resources.Info.APIToken = getEnv("TW_MCP_API_TOKEN", "")
+	resources.Info.CustomerURL = strings.TrimSuffix(getEnv("TW_MCP_CUSTOMER_URL", ""), "/")
 	resources.Info.Log.Format = strings.ToLower(getEnv("TW_MCP_LOG_FORMAT", "text"))
 	resources.Info.Log.Level = strings.ToLower(getEnv("TW_MCP_LOG_LEVEL", "info"))
 	resources.Info.Log.SentryDSN = getEnv("TW_MCP_SENTRY_DSN", "")

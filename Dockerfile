@@ -35,6 +35,8 @@ RUN go build -ldflags="-X 'github.com/teamwork/mcp/internal/config.Version=$BUIL
 #
 FROM alpine:3 AS runner
 
+RUN apk add --no-cache curl
+
 COPY --from=builder /app/tw-mcp-http /bin/tw-mcp-http
 COPY --from=builder /app/tw-mcp-stdio /bin/tw-mcp-stdio
 

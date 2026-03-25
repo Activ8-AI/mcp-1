@@ -1,32 +1,32 @@
 <!-- managed-by: activ8-ai-context-pack | pack-version: 1.2.0 -->
 <!-- source-sha: a0d4785 -->
-<!-- platform: codex-cli | tier: T1 | version: 1.2.0 | policy: ai-agent-policy@wrapper | updated: 2026-03-18 -->
+<!-- platform: claude-code | tier: T2 | version: 1.2.0 | policy: ai-agent-policy@wrapper | updated: 2026-03-18 -->
 
-# AGENTS.md — mcp-1
+# CLAUDE.md — mcp-1
 
 **Charter binding:** Activ8 AI Operational Execution & Accountability Charter (v1.5).
 
-## Source of truth
+## What to read first
 
-- Local routing map: `docs/SOURCES-OF-TRUTH.md`
-- Local audience + surface contract: `docs/AUDIENCE-SURFACE-CONTRACT.md`
-- Central canonical policy: `https://github.com/Activ8-AI/activ8-ai-unified-mcp-server` at `.github/ai-agent-policy.md`
+- `docs/SOURCES-OF-TRUTH.md` (this repo)
+- `docs/AUDIENCE-SURFACE-CONTRACT.md` (this repo)
+- Central canonical SSOT map: `https://github.com/Activ8-AI/activ8-ai-unified-mcp-server` at `docs/SOURCES-OF-TRUTH.md`
 
 ## Output contract
 
 `Progress | Evidence | Blockers`
 
-## Obvious-Answer Question Elimination Rule
+## Execution Rule
 
-- Do not ask for confirmation when the requested action is already clear.
-- Execute the next obvious step and present the result.
+- Obvious-Answer Question Elimination Rule applies.
+- If the next action is already clear, execute it instead of asking.
 
 ## Seek-First Planning Gate
 
 - No action begins without a plan.
 - Verify in order: Notion first, then repo, then local/runtime files.
 - Search for existing artifacts before touching or proposing anything new.
-- Build on lineage before create-new.
+- Build on established work whenever possible; create new only when no suitable precedent exists.
 
 ## Seek First to Understand + Verify What Exists
 
@@ -37,17 +37,10 @@
 - **Create new only when necessary:** new artifacts or structures only when no suitable reference, structure, or precedent exists.
 - **Fail closed on deviation:** if verification is missing, the user correction changes the path, or drift is detected, stop, surface the mismatch, and restart from verified state.
 
-## Managed Repo Operationalization
+## Managed Repo Contract
 
-- Run `npm run operationalize:repo -- --dry-run` in preflight paths.
-- Keep `.github/workflows/build-operationalization.yml` present and green.
-- Keep prompt assets in `artifacts/prompt-library/` aligned to the central control plane.
-
-## Automatic Source Bootstrap
-
-- Run `npm run session:boot` at session start when the brief is missing or stale.
-- Reuse `memory/session-brief.md` and the receipts under `artifacts/source-query-ladder/` before broadening into fresh live workspace search.
-- Treat missing `scripts/session-boot.mjs` or `scripts/query-source-ladder.mjs` as a contract failure, not a convenience gap.
+- Validate with `npm run operationalize:build`.
+- Run `npm run operationalize:repo -- --with-sync` in closeout-capable flows when Notion is available.
 
 ## Runtime Session Bootstrap Gate
 
@@ -78,13 +71,7 @@
 - `MANAGE` -> response, override, rollback, deactivation, and continual improvement.
 - Import NIST as enforceable control-plane logic for socio-technical agent systems, not as a generic compliance checklist.
 
-## Trace + Audience Contract
+## Trace + Audience Rule
 
-- Treat prior lineage as the default, not the exception.
-- Before classifying work as net-new, search for earlier mention, precursor language, adjacent framing, and codification.
-- Use `docs/AUDIENCE-SURFACE-CONTRACT.md` to classify the surface you are touching and bind:
-  `Audience`, `Surface Type`, `Canonical Source`, `Genesis`, and `Trace Origin`.
-
-## Relay Identity Binding
-
-- For Cursor-bound relay references in `AGENTS.md`, use `relayCursorAgent` as the relay identity label, not `CursorAgent`.
+- Assume prior lineage exists unless trace search proves otherwise.
+- Use `docs/AUDIENCE-SURFACE-CONTRACT.md` to classify the active surface and bind `Genesis`, `Trace Origin`, and `Canonical Source` before introducing new governed artifacts.
