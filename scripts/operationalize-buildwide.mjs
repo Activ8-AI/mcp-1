@@ -169,9 +169,17 @@ async function main() {
 
   const jsonPath = join(OUTPUT_DIR, `${ts}__repo_operationalization.json`);
   const mdPath = join(OUTPUT_DIR, `${ts}__repo_operationalization.md`);
+  const latestBuildwideJsonPath = join(OUTPUT_DIR, "latest__buildwide_operationalization.json");
+  const latestBuildwideMdPath = join(OUTPUT_DIR, "latest__buildwide_operationalization.md");
   writeFileSync(jsonPath, `${JSON.stringify(payload, null, 2)}\n`, "utf-8");
   writeFileSync(
     mdPath,
+    `# Repo Operationalization\n\n- Status: ${status}\n- Generated: ${payload.generated_at_ct}\n- Steps: ${steps.length}\n`,
+    "utf-8"
+  );
+  writeFileSync(latestBuildwideJsonPath, `${JSON.stringify(payload, null, 2)}\n`, "utf-8");
+  writeFileSync(
+    latestBuildwideMdPath,
     `# Repo Operationalization\n\n- Status: ${status}\n- Generated: ${payload.generated_at_ct}\n- Steps: ${steps.length}\n`,
     "utf-8"
   );
@@ -191,6 +199,8 @@ async function main() {
     artifacts: {
       json: jsonPath,
       markdown: mdPath,
+      latest_buildwide_json: latestBuildwideJsonPath,
+      latest_buildwide_markdown: latestBuildwideMdPath,
     },
   });
 

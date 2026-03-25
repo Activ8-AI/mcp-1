@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/subtle"
 	"fmt"
 	"io"
 	"log/slog"
@@ -207,6 +208,33 @@ func basicAuthMiddleware(resources config.Resources, next http.Handler) http.Han
 				next.ServeHTTP(w, r)
 				return
 			}
+		}
+
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			content, err := io.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+				return
+			}
+
+			bypass, err := auth.Bypass(content)
+			if err != nil || !bypass {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			r.Body = io.NopCloser(bytes.NewBuffer(content))
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		username, password, ok := auth.ParseBasicAuth(authHeader)
+		if !ok ||
+			subtle.ConstantTimeCompare([]byte(username), []byte(resources.Info.APIToken)) != 1 ||
+			subtle.ConstantTimeCompare([]byte(password), []byte("x")) != 1 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
 		}
 
 		// In basic auth mode, inject the customer URL from config and proceed.
